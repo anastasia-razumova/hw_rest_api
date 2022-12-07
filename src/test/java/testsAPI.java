@@ -32,7 +32,6 @@ public class testsAPI {
 
     }
 
-
     @Test
     void deleteUser() {
         given()
@@ -46,7 +45,7 @@ public class testsAPI {
     }
 
     @Test
-    public void registerUserSuccess() {
+    void registerUserSuccess() {
 
         given()
                 .body("{\n"
@@ -62,7 +61,7 @@ public class testsAPI {
     }
 
     @Test
-    public void userLoginFail() {
+    void userLoginFail() {
         given()
                 .body("{\n"
                         + "    \"email\": \"peter@klaven\",\n"
