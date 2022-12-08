@@ -1,16 +1,25 @@
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
+
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.*;
 
 
-public class testsAPI {
+public class TestsAPI {
+
+    @BeforeAll
+    static void configure() {
+        RestAssured.baseURI = "https://reqres.in/api";
+    }
+
     @Test
     void getSingleUser() {
         given()
                 .log().uri()
                 .when()
-                .get("https://reqres.in/api/users/2")
+                .get("/users/2")
                 .then()
                 .log().status()
                 .log().body()
@@ -23,7 +32,7 @@ public class testsAPI {
         given()
                 .log().uri()
                 .when()
-                .get("https://reqres.in/api/users?page=2")
+                .get("/users?page=2")
                 .then()
                 .log().status()
                 .log().body()
@@ -37,7 +46,7 @@ public class testsAPI {
         given()
                 .log().uri()
                 .when()
-                .delete("https://reqres.in/api/users/2")
+                .delete("/users/2")
                 .then()
                 .log().status()
                 .log().body()
@@ -52,9 +61,9 @@ public class testsAPI {
                         + "    \"email\": \"eve.holt@reqres.in\",\n"
                         + "    \"password\": \"pistol\"\n"
                         + "}")
-                .contentType("application/json").
-                when().
-                post("https://reqres.in/api/register")
+                .contentType("application/json")
+                .when()
+                .post("/register")
                 .then()
                 .statusCode(200)
                 .body("token", is("QpwL5tke4Pnpja7X4"));
@@ -66,9 +75,9 @@ public class testsAPI {
                 .body("{\n"
                         + "    \"email\": \"peter@klaven\",\n"
                         + "}")
-                .contentType("application/json").
-                when().
-                post("https://reqres.in/api/register")
+                .contentType("application/json")
+                .when()
+                .post("/register")
                 .then()
                 .statusCode(400);
     }
