@@ -1,11 +1,30 @@
+import io.qameta.allure.restassured.AllureRestAssured;
+import models.lombok.UserCreationModel;
+import models.lombok.UserCreationResponse;
+import models.pojo.CreateUserModel;
+import models.pojo.CreateUserResponse;
+
+import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static helpers.CustomApiListener.withCustomTemplates;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.*;
 
+import static specs.CreateUserSpecs.createUserRequestSpec;
+import static specs.CreateUserSpecs.createUserResponseSpec;
+import static specs.GetUserSpec.singleUserRequestSpec;
+import static specs.GetUserSpec.singleUserResponseSpec;
+import static specs.UsersListSpec.getUsersListRequestSpec;
+import static specs.UsersListSpec.getUsersListResponseSpec;
+import static specs.DeleteUserSpec.deleteUserRequestSpec;
+import static specs.DeleteUserSpec.deleteUserResponseSpec;
+import static specs.NotFoundUserSpecs.notFoundUserRequestSpec;
+import static specs.NotFoundUserSpecs.notFoundUserResponseSpec;
 
 public class TestsAPI {
 
@@ -15,28 +34,137 @@ public class TestsAPI {
     }
 
     @Test
-    void getSingleUser() {
-        given()
-                .log().uri()
+    void createUserPojoTest() {
+        // String data = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
+        CreateUserModel userModel = new CreateUserModel();
+        userModel.setJob("leader");
+        userModel.setName("morpheus");
+
+        CreateUserResponse responseModel = given()
+                .log().all()
+                .contentType(JSON)
+                .body(userModel)
                 .when()
-                .get("/users/2")
+                .post("/users")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
+                .statusCode(201)
+                .extract().as(CreateUserResponse.class);
+
+        assertThat(responseModel.getJob()).isEqualTo("leader");
+        assertThat(responseModel.getName()).isEqualTo("morpheus");
+    }
+
+    @Test
+    void createUserLombokTest() {
+        UserCreationModel userModel = new UserCreationModel();
+        userModel.setJob("leader");
+        userModel.setName("morpheus");
+
+        UserCreationResponse responseModel = given()
+                    .log().all()
+                    .contentType(JSON)
+                    .body(userModel)
+                    .when()
+                    .post("/users")
+                    .then()
+                    .log().status()
+                    .log().body()
+                    .statusCode(201) // Created
+                    .extract().as(UserCreationResponse.class);
+
+            assertThat(responseModel.getJob()).isEqualTo("leader");
+            assertThat(responseModel.getName()).isEqualTo("morpheus");
+        }
+
+
+    @Test
+    void createUserWithAllureListenerTest() {
+        UserCreationModel userModel = new UserCreationModel();
+        userModel.setJob("leader");
+        userModel.setName("morpheus");
+
+        UserCreationResponse responseModel = given()
+                .filter(new AllureRestAssured())
+                .log().all()
+                .contentType(JSON)
+                .body(userModel)
+                .when()
+                .post("/users")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(201) // Created
+                .extract().as(UserCreationResponse.class);
+
+        assertThat(responseModel.getJob()).isEqualTo("leader");
+        assertThat(responseModel.getName()).isEqualTo("morpheus");
+    }
+
+    @Test
+    void createUserWithCustomAllureListenerTest() {
+        UserCreationModel userModel = new UserCreationModel();
+        userModel.setJob("leader");
+        userModel.setName("morpheus");
+
+        UserCreationResponse responseModel = given()
+                .filter(withCustomTemplates())
+                .log().all()
+                .contentType(JSON)
+                .body(userModel)
+                .when()
+                .post("/users")
+                .then()
+                .log().status()
+                .log().body()
+                .statusCode(201) // Created
+                .extract().as(UserCreationResponse.class);
+
+        assertThat(responseModel.getJob()).isEqualTo("leader");
+        assertThat(responseModel.getName()).isEqualTo("morpheus");
+    }
+
+    @Test
+    void createUserWithSpecsTest() {
+        UserCreationModel userModel = new UserCreationModel();
+        userModel.setJob("leader");
+        userModel.setName("morpheus");
+
+        UserCreationResponse responseModel = given()
+                //given(createUserRequestSpec)
+                .spec(createUserRequestSpec)
+                .body(userModel)
+                .when()
+                .post("/users")
+                .then()
+                .spec(createUserResponseSpec)
+                .extract().as(UserCreationResponse.class);
+
+        assertThat(responseModel.getJob()).isEqualTo("leader");
+        assertThat(responseModel.getName()).isEqualTo("morpheus");
+    }
+
+
+    @Test
+    void getSingleUser() {
+        given()
+                .spec(singleUserRequestSpec)
+                .when()
+                .get("/users/2")
+                .then()
+                .spec(singleUserResponseSpec)
                 .body("data.id", is(2));
     }
 
     @Test
     void getUsersList() {
         given()
-                .log().uri()
+                .spec(getUsersListRequestSpec)
                 .when()
                 .get("/users?page=2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(200)
+                .spec(getUsersListResponseSpec)
                 .body(containsString("id"));
 
     }
@@ -44,41 +172,23 @@ public class TestsAPI {
     @Test
     void deleteUser() {
         given()
-                .log().uri()
+                .spec(deleteUserRequestSpec)
                 .when()
                 .delete("/users/2")
                 .then()
-                .log().status()
-                .log().body()
-                .statusCode(204);
+                .spec(deleteUserResponseSpec);
     }
 
     @Test
-    void registerUserSuccess() {
-
+    void notFoundUserTest() {
         given()
-                .body("{\n"
-                        + "    \"email\": \"eve.holt@reqres.in\",\n"
-                        + "    \"password\": \"pistol\"\n"
-                        + "}")
-                .contentType("application/json")
+                .spec(notFoundUserRequestSpec)
                 .when()
-                .post("/register")
+                .get("/api/users/23")
                 .then()
-                .statusCode(200)
-                .body("token", is("QpwL5tke4Pnpja7X4"));
+                .spec(notFoundUserResponseSpec);
     }
 
-    @Test
-    void userLoginFail() {
-        given()
-                .body("{\n"
-                        + "    \"email\": \"peter@klaven\",\n"
-                        + "}")
-                .contentType("application/json")
-                .when()
-                .post("/register")
-                .then()
-                .statusCode(400);
-    }
+
+
 }
