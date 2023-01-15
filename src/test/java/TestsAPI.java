@@ -4,6 +4,7 @@ import models.lombok.UserCreationResponse;
 import models.pojo.CreateUserModel;
 import models.pojo.CreateUserResponse;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -33,6 +34,7 @@ public class TestsAPI {
         RestAssured.baseURI = "https://reqres.in/api";
     }
 
+    @DisplayName("Создание пользователя с Pojo")
     @Test
     void createUserPojoTest() {
         // String data = "{ \"name\": \"morpheus\", \"job\": \"leader\" }";
@@ -56,6 +58,7 @@ public class TestsAPI {
         assertThat(responseModel.getName()).isEqualTo("morpheus");
     }
 
+    @DisplayName("Создание пользователя с Lombok")
     @Test
     void createUserLombokTest() {
         UserCreationModel userModel = new UserCreationModel();
@@ -79,6 +82,7 @@ public class TestsAPI {
         }
 
 
+    @DisplayName("Создание пользователя с Allure Listener")
     @Test
     void createUserWithAllureListenerTest() {
         UserCreationModel userModel = new UserCreationModel();
@@ -102,6 +106,7 @@ public class TestsAPI {
         assertThat(responseModel.getName()).isEqualTo("morpheus");
     }
 
+    @DisplayName("Создание пользователя с Custom Allure Listener")
     @Test
     void createUserWithCustomAllureListenerTest() {
         UserCreationModel userModel = new UserCreationModel();
@@ -125,6 +130,7 @@ public class TestsAPI {
         assertThat(responseModel.getName()).isEqualTo("morpheus");
     }
 
+    @DisplayName("Создание пользователя с Specs")
     @Test
     void createUserWithSpecsTest() {
         UserCreationModel userModel = new UserCreationModel();
@@ -146,6 +152,7 @@ public class TestsAPI {
     }
 
 
+    @DisplayName("Запрос данных о конкретном пользователе")
     @Test
     void getSingleUser() {
         given()
@@ -157,6 +164,7 @@ public class TestsAPI {
                 .body("data.id", is(2));
     }
 
+    @DisplayName("Запрос данных о списке пользователей")
     @Test
     void getUsersList() {
         given()
@@ -169,6 +177,7 @@ public class TestsAPI {
 
     }
 
+    @DisplayName("Удаление пользователя")
     @Test
     void deleteUser() {
         given()
@@ -179,6 +188,7 @@ public class TestsAPI {
                 .spec(deleteUserResponseSpec);
     }
 
+    @DisplayName("Негативный тест на поиск несуществующего пользователя")
     @Test
     void notFoundUserTest() {
         given()
