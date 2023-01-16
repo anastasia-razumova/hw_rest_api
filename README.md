@@ -1,4 +1,4 @@
-#  Проект по API тестированию для [reqres.in](https://reqres.in/)
+#  Проект по автоматизаци API тестов для [reqres.in](https://reqres.in/)
 
 ##	Содержание
 
@@ -44,7 +44,7 @@ gradle clean test
 ```
 
 ## <img width="4%" title="Jenkins" src="images/Jenkins_logo.svg"> Запуск тестов в [Jenkins](https://jenkins.autotests.cloud/job/hw_rest_api/):
-Для запуска сборки необходимо нажать кнопку <code><strong>*Собрать*</strong></code>.
+Для запуска сборки необходимо нажать кнопку <code><strong>*Собрать сейчас*</strong></code>.
 
 <p align="center">
   <img src="images/jenk2.png" alt="Jenkins" width="800">
