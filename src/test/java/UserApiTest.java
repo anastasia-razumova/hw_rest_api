@@ -46,7 +46,6 @@ public class UserApiTest extends TestBase{
         userModel.setName("morpheus");
 
         UserCreationResponse responseModel = given()
-                //given(createUserRequestSpec)
                 .spec(request)
                 .body(userModel)
                 .when()
